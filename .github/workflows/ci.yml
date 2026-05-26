@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   pull_request:
@@ -149,4 +149,4 @@ jobs:
           IMAGE_TAG: ${{ needs.docker-build-push.outputs.image_tag }}
           GIT_AUTHOR_NAME: github-actions
           GIT_AUTHOR_EMAIL: actions@github.com
-          
+
