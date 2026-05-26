@@ -126,16 +126,16 @@ jobs:
           git clone https://${{ secrets.HELM_REPO_USER }}:${{ secrets.GITOPS_PAT }}@github.com/${{ github.repository_owner }}/${{ env.HELM_REPO_NAME }}.git helm-repo
 
       - name: Update Helm values.yaml image and tag
+        run: |
+          cd helm-repo
+          yq eval '.app.image = strenv($IMAGE) | .app.tag = strenv(IMAGE_TAG)' -i helm/vprofile/values.yaml
         env:
           IMAGE_TAG: ${{ needs.docker-build-push.outputs.image_tag }}
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
-        run: |
-          cd vprofile-helm
-          yq eval '.app.image = env(IMAGE) | .app.tag = env(IMAGE_TAG)' -i helm/vprofile/values.yaml
 
       - name: Commit and push Helm repo update
         run: |
-          cd vprofile-helm
+          cd helm-repo
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           if ! git diff --quiet; then
