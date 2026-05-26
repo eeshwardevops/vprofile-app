@@ -17,7 +17,7 @@ env:
 
 jobs:
   build-and-sonar:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     name: Build, Test, Checkstyle & SonarQube
     runs-on: ubuntu-latest
     steps:
@@ -130,12 +130,12 @@ jobs:
           IMAGE_TAG: ${{ needs.docker-build-push.outputs.image_tag }}
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
         run: |
-          cd helm-repo
+          cd vprofile-helm
           yq eval '.app.image = env(IMAGE) | .app.tag = env(IMAGE_TAG)' -i helm/vprofile/values.yaml
 
       - name: Commit and push Helm repo update
         run: |
-          cd helm-repo
+          cd vprofile-helm
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           if ! git diff --quiet; then
