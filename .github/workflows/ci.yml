@@ -128,7 +128,7 @@ jobs:
       - name: Update Helm values.yaml image and tag
         run: |
           cd helm-repo
-          yq eval '.app.image = strenv($IMAGE) | .app.tag = strenv(IMAGE_TAG)' -i helm/vprofile/values.yaml
+          yq eval '.app.image = strenv(IMAGE) | .app.tag = strenv(IMAGE_TAG)' -i helm/vprofile/values.yaml
         env:
           IMAGE_TAG: ${{ needs.docker-build-push.outputs.image_tag }}
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
