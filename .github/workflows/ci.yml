@@ -19,7 +19,7 @@ jobs:
   build-and-sonar:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     name: Build, Test, Checkstyle & SonarQube
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -87,7 +87,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        id: set-outputs
+        #id: set-outputs
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -100,6 +100,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Set output variables
+        id: set-outputs
         run: |
           echo "registry=${{ env.DOCKERHUB_REGISTRY }}" >> $GITHUB_OUTPUT
           echo "image=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}" >> $GITHUB_OUTPUT
@@ -128,7 +129,7 @@ jobs:
       - name: Update Helm values.yaml image and tag
         run: |
           cd helm-repo
-          yq eval '.app.image = strenv($IMAGE) | .app.tag = strenv(IMAGE_TAG)' -i helm/vprofile/values.yaml
+          yq eval '.app.image = strenv(IMAGE) | .app.tag = strenv(IMAGE_TAG)' -i helm/vprofile/values.yaml
         env:
           IMAGE_TAG: ${{ needs.docker-build-push.outputs.image_tag }}
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
