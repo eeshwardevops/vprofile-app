@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Continuous Integration/Continuous Delivery Pipeline
 
 on:
   pull_request:
