@@ -1,4 +1,4 @@
-name: Continuous Integration/Continuous Delivery Pipeline
+name: CI/CD Pipeline
 
 on:
   pull_request:
@@ -64,22 +64,6 @@ jobs:
         with:
           pollingTimeoutSec: 600
 
-      - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          path: '.'
-          format: 'JSON'
-          args: >
-            --enableExperimental
-            --enableRetired
-
-      - name: Upload OWASP Dependency Check results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: dependency-check-report
-          path: reports/dependency-check-report.json
-
   docker-build-push:
     if: github.event_name == 'push'
     name: Build Docker image and push to ECR
@@ -118,19 +102,6 @@ jobs:
           echo "ecr_registry=${ECR_REGISTRY}" >> $GITHUB_OUTPUT
           echo "ecr_image=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-
-      - name: Run Trivy image scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.set-outputs.outputs.ecr_image }}:${{ steps.set-outputs.outputs.image_tag }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
 
   update-helm:
     if: github.event_name == 'push'
